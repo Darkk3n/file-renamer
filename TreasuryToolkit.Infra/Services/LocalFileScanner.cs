@@ -115,7 +115,7 @@ namespace TreasuryToolkit.Infra.Services
             // Changing +? to + forces it to grab the whole phrase on that line.
             // The lookahead ensures that if "Referencia" is present, it stops right before it.
             #region Reason
-            Match reasonMatch = Regex.Match(rawPdfText, @"(?:Motivo\s+de\s+pago:|Concepto\s+de\s+pago:|Detalle\s+de\s+pago:|Concepto\s+CIE:)\s*([^\r\n]+)", RegexOptions.IgnoreCase);
+            Match reasonMatch = Regex.Match(rawPdfText, @"(?:Motivo\s+de\s+pago:|Concepto\s+de\s+pago:|Detalle\s+de\ +pago:|Concepto\s+CIE:|Referencia\s+del\s+Beneficiario:)\s*([^\r\n]+)", RegexOptions.IgnoreCase);
 
             if (reasonMatch.Success)
             {
