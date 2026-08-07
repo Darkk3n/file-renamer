@@ -140,14 +140,13 @@ namespace TreasuryToolkit.App
                 .ToList();
 
             int totalRows = paymentRows.Count;
-            int startConsecutive = string.IsNullOrEmpty(TxtConsecutive.Text) ? 0 : int.Parse(TxtConsecutive.Text);
             var company = (CompanyModel)CmbCompany.SelectedItem;
             var retry = true;
             while (retry)
             {
                 try
                 {
-                    pdfProcessor.ProcessPaymentBatch(files, paymentRows, company.Name, startConsecutive,
+                    pdfProcessor.ProcessPaymentBatch(files, paymentRows, company.Name,
                        (currentRowIndex, currentFileName) =>
                        {
                            // This code runs INSIDE the loop of the service, but executes on the Form!
@@ -244,19 +243,6 @@ namespace TreasuryToolkit.App
             {
                 // e.Handled = true means "we handled this event, ignore the keystroke"
                 e.Handled = true;
-            }
-        }
-
-        private void CmbCompany_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (CmbCompany.SelectedIndex == 0) return;
-
-            var selectedCompany = (CompanyModel)CmbCompany.SelectedItem;
-            LblConsecutive.Visible = CmbCompany.SelectedIndex != 0 && selectedCompany.Name == "EMKA";
-            TxtConsecutive.Visible = CmbCompany.SelectedIndex != 0 && selectedCompany.Name == "EMKA";
-            if (selectedCompany.Name != "EMKA")
-            {
-                TxtConsecutive.Text = string.Empty;
             }
         }
         #endregion
@@ -403,12 +389,6 @@ namespace TreasuryToolkit.App
                 MessageBox.Show("Seleccione una carpeta para continuar", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-            if (CmbCompany.SelectedItem.ToString() == "EMKA" && string.IsNullOrEmpty(TxtConsecutive.Text))
-            {
-                MessageBox.Show("Ingrese un número consecutivo.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
             return true;
         }
 

@@ -42,8 +42,6 @@
             label2 = new Label();
             LblFolder = new Label();
             BtnFileDialog = new Button();
-            LblConsecutive = new Label();
-            TxtConsecutive = new TextBox();
             ((System.ComponentModel.ISupportInitialize)DgvPayments).BeginInit();
             SuspendLayout();
             // 
@@ -129,7 +127,6 @@
             CmbCompany.Name = "CmbCompany";
             CmbCompany.Size = new Size(239, 29);
             CmbCompany.TabIndex = 3;
-            CmbCompany.SelectedIndexChanged += CmbCompany_SelectedIndexChanged;
             // 
             // BtnStart
             // 
@@ -178,35 +175,11 @@
             BtnFileDialog.UseVisualStyleBackColor = true;
             BtnFileDialog.Click += BtnFileDialog_Click;
             // 
-            // LblConsecutive
-            // 
-            LblConsecutive.AutoSize = true;
-            LblConsecutive.Location = new Point(552, 25);
-            LblConsecutive.Margin = new Padding(4, 0, 4, 0);
-            LblConsecutive.Name = "LblConsecutive";
-            LblConsecutive.Size = new Size(98, 21);
-            LblConsecutive.TabIndex = 8;
-            LblConsecutive.Text = "Consecutivo:";
-            LblConsecutive.Visible = false;
-            // 
-            // TxtConsecutive
-            // 
-            TxtConsecutive.BorderStyle = BorderStyle.FixedSingle;
-            TxtConsecutive.Location = new Point(651, 22);
-            TxtConsecutive.Margin = new Padding(4);
-            TxtConsecutive.Name = "TxtConsecutive";
-            TxtConsecutive.Size = new Size(152, 29);
-            TxtConsecutive.TabIndex = 9;
-            TxtConsecutive.Visible = false;
-            TxtConsecutive.KeyPress += TxtConsecutive_KeyPress;
-            // 
             // UcFileRenamer
             // 
             AutoScaleDimensions = new SizeF(9F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            Controls.Add(TxtConsecutive);
-            Controls.Add(LblConsecutive);
             Controls.Add(BtnFileDialog);
             Controls.Add(LblFolder);
             Controls.Add(label2);
@@ -241,7 +214,5 @@
         private DataGridViewTextBoxColumn dgvPaymentsColConcept;
         private DataGridViewTextBoxColumn dgvPaymentsColAmount;
         private DataGridViewTextBoxColumn Column2;
-        private Label LblConsecutive;
-        private TextBox TxtConsecutive;
     }
 }
