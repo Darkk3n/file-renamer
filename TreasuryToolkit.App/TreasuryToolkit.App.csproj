@@ -17,9 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Data\companies.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <EmbeddedResource Include="Data\companies.json">      
+    </EmbeddedResource>
     <Content Include="Icon3.ico" />
   </ItemGroup>
 

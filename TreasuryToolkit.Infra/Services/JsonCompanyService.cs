@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using TreasuryToolkit.Core.Contracts;
@@ -15,11 +18,19 @@ namespace TreasuryToolkit.Infra.Services
         {
             try
             {
-                string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\companies.json");
+                string jsonContent = null;
+                var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+                string resourceName = assembly.GetManifestResourceNames()
+                                              .FirstOrDefault(str => str.EndsWith("companies.json", StringComparison.OrdinalIgnoreCase));
 
-                if (File.Exists(jsonPath))
+                if (resourceName != null)
                 {
-                    string jsonContent = File.ReadAllText(jsonPath);
+                    using Stream stream = assembly.GetManifestResourceStream(resourceName);
+                    using StreamReader reader = new(stream, Encoding.UTF8);
+                    jsonContent = reader.ReadToEnd();
+                }
+                if (!string.IsNullOrEmpty(jsonContent))
+                {
                     _companies = JsonSerializer.Deserialize<List<CompanyModel>>(jsonContent) ?? [];
                 }
                 else
