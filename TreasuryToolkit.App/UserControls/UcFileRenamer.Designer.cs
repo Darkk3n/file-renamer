@@ -30,18 +30,19 @@
         {
             BtnClean = new Button();
             DgvPayments = new DataGridView();
-            dgvPaymentsColDate = new DataGridViewTextBoxColumn();
-            Column1 = new DataGridViewTextBoxColumn();
-            dgvPaymentsColVendor = new DataGridViewTextBoxColumn();
-            dgvPaymentsColConcept = new DataGridViewTextBoxColumn();
-            dgvPaymentsColAmount = new DataGridViewTextBoxColumn();
-            Column2 = new DataGridViewTextBoxColumn();
             label1 = new Label();
             CmbCompany = new ComboBox();
             BtnStart = new Button();
             label2 = new Label();
             LblFolder = new Label();
             BtnFileDialog = new Button();
+            dgvPaymentsColDate = new DataGridViewTextBoxColumn();
+            Column1 = new DataGridViewTextBoxColumn();
+            dgvPaymentsColVendor = new DataGridViewTextBoxColumn();
+            dgvPaymentsColConcept = new DataGridViewTextBoxColumn();
+            dgvPaymentsColAmount = new DataGridViewTextBoxColumn();
+            Column2 = new DataGridViewTextBoxColumn();
+            Column3 = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)DgvPayments).BeginInit();
             SuspendLayout();
             // 
@@ -64,7 +65,7 @@
             DgvPayments.BackgroundColor = Color.White;
             DgvPayments.BorderStyle = BorderStyle.None;
             DgvPayments.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            DgvPayments.Columns.AddRange(new DataGridViewColumn[] { dgvPaymentsColDate, Column1, dgvPaymentsColVendor, dgvPaymentsColConcept, dgvPaymentsColAmount, Column2 });
+            DgvPayments.Columns.AddRange(new DataGridViewColumn[] { dgvPaymentsColDate, Column1, dgvPaymentsColVendor, dgvPaymentsColConcept, dgvPaymentsColAmount, Column2, Column3 });
             DgvPayments.Dock = DockStyle.Bottom;
             DgvPayments.EnableHeadersVisualStyles = false;
             DgvPayments.Location = new Point(0, 138);
@@ -76,36 +77,6 @@
             DgvPayments.CellValidated += DgvPayments_CellValidated;
             DgvPayments.CellValidating += DgvPayments_CellValidating;
             DgvPayments.DefaultValuesNeeded += DgvPayments_DefaultValuesNeeded;
-            // 
-            // dgvPaymentsColDate
-            // 
-            dgvPaymentsColDate.HeaderText = "Fecha";
-            dgvPaymentsColDate.Name = "dgvPaymentsColDate";
-            // 
-            // Column1
-            // 
-            Column1.HeaderText = "Archivo";
-            Column1.Name = "Column1";
-            // 
-            // dgvPaymentsColVendor
-            // 
-            dgvPaymentsColVendor.HeaderText = "Proveedor";
-            dgvPaymentsColVendor.Name = "dgvPaymentsColVendor";
-            // 
-            // dgvPaymentsColConcept
-            // 
-            dgvPaymentsColConcept.HeaderText = "Concepto";
-            dgvPaymentsColConcept.Name = "dgvPaymentsColConcept";
-            // 
-            // dgvPaymentsColAmount
-            // 
-            dgvPaymentsColAmount.HeaderText = "Monto";
-            dgvPaymentsColAmount.Name = "dgvPaymentsColAmount";
-            // 
-            // Column2
-            // 
-            Column2.HeaderText = "Divisa";
-            Column2.Name = "Column2";
             // 
             // label1
             // 
@@ -175,6 +146,41 @@
             BtnFileDialog.UseVisualStyleBackColor = true;
             BtnFileDialog.Click += BtnFileDialog_Click;
             // 
+            // dgvPaymentsColDate
+            // 
+            dgvPaymentsColDate.HeaderText = "Fecha";
+            dgvPaymentsColDate.Name = "dgvPaymentsColDate";
+            // 
+            // Column1
+            // 
+            Column1.HeaderText = "Archivo";
+            Column1.Name = "Column1";
+            // 
+            // dgvPaymentsColVendor
+            // 
+            dgvPaymentsColVendor.HeaderText = "Proveedor";
+            dgvPaymentsColVendor.Name = "dgvPaymentsColVendor";
+            // 
+            // dgvPaymentsColConcept
+            // 
+            dgvPaymentsColConcept.HeaderText = "Concepto";
+            dgvPaymentsColConcept.Name = "dgvPaymentsColConcept";
+            // 
+            // dgvPaymentsColAmount
+            // 
+            dgvPaymentsColAmount.HeaderText = "Monto";
+            dgvPaymentsColAmount.Name = "dgvPaymentsColAmount";
+            // 
+            // Column2
+            // 
+            Column2.HeaderText = "Divisa";
+            Column2.Name = "Column2";
+            // 
+            // Column3
+            // 
+            Column3.HeaderText = "Comentario";
+            Column3.Name = "Column3";
+            // 
             // UcFileRenamer
             // 
             AutoScaleDimensions = new SizeF(9F, 21F);
@@ -214,5 +220,6 @@
         private DataGridViewTextBoxColumn dgvPaymentsColConcept;
         private DataGridViewTextBoxColumn dgvPaymentsColAmount;
         private DataGridViewTextBoxColumn Column2;
+        private DataGridViewTextBoxColumn Column3;
     }
 }

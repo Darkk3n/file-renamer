@@ -38,7 +38,8 @@ namespace TreasuryToolkit.Infra.Services
                 var comment = string.Join("_", (row.Comment ?? string.Empty).Split(Path.GetInvalidFileNameChars())).Trim();
 
                 string directory = Path.GetDirectoryName(currentFilePath);
-                string newFileName = $"{row.Date}-{companyName}-{vendor} {concept}-{amount} {currency}{comment}.pdf";
+                var finalComment = !string.IsNullOrEmpty(comment) ? $"({comment})" : string.Empty;
+                string newFileName = $"{row.Date}-{companyName}-{vendor} {concept}-{amount} {currency}{finalComment}.pdf";
                 string destinationPath = Path.Combine(directory, newFileName);
                 string safeDestinationPath = GetUniqueFilePath(destinationPath);
 

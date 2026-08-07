@@ -136,7 +136,7 @@ namespace TreasuryToolkit.App
                     Concept = r.Cells[3].Value?.ToString(),
                     Amount = r.Cells[4].FormattedValue?.ToString(),
                     Currency = r.Cells[5].Value?.ToString(),
-                    Comment = $"({r.Cells[6].Value?.ToString()})"
+                    Comment = $"{r.Cells[6].Value?.ToString()}"
                 })
                 .ToList();
 
