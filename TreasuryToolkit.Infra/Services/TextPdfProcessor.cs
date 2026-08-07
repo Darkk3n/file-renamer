@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection.PortableExecutable;
-using System.Text;
+﻿using System.Text;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas;
 using TreasuryToolkit.Core.Contracts;
@@ -11,11 +8,10 @@ namespace TreasuryToolkit.Infra.Services
 {
     public class TextPdfProcessor : IPdfProcessor
     {
-        public void ProcessPaymentBatch(string[] files, List<PaymentRowData> rows, string companyName, int startConsecutive, Action<int, string> onRowProcessed)
+        public void ProcessPaymentBatch(string[] files, List<PaymentRowData> rows, string companyName, Action<int, string> onRowProcessed)
         {
             int currentFileIndex = 0;
             int internalPageTracker = 1;
-            int consecutiveNumber = startConsecutive;
             bool useConsecutive = companyName == "EMKA";
             List<string> filesToDelete = [];
 
@@ -33,7 +29,6 @@ namespace TreasuryToolkit.Infra.Services
                 onRowProcessed?.Invoke(i, Path.GetFileName(currentFilePath));
 
                 var row = rows[i];
-                if (useConsecutive && i > 0) consecutiveNumber++;
 
                 // Clean file string strings
                 var vendor = string.Join("_", (row.Vendor ?? string.Empty).Split(Path.GetInvalidFileNameChars())).Trim();
@@ -42,8 +37,7 @@ namespace TreasuryToolkit.Infra.Services
                 var currency = string.Join("_", (row.Currency ?? string.Empty).Split(Path.GetInvalidFileNameChars())).Trim();
 
                 string directory = Path.GetDirectoryName(currentFilePath);
-                var consecutivePart = useConsecutive ? $"{consecutiveNumber}-" : "";
-                string newFileName = $"{row.Date}-{companyName}-{consecutivePart}{vendor} {concept}-{amount} {currency}.pdf";
+                string newFileName = $"{row.Date}-{companyName}-{vendor} {concept}-{amount} {currency}.pdf";
                 string destinationPath = Path.Combine(directory, newFileName);
                 string safeDestinationPath = GetUniqueFilePath(destinationPath);
 
