@@ -141,7 +141,7 @@ namespace TreasuryToolkit.App
 
             int totalRows = paymentRows.Count;
             int startConsecutive = string.IsNullOrEmpty(TxtConsecutive.Text) ? 0 : int.Parse(TxtConsecutive.Text);
-            var company = (CompanyModel) CmbCompany.SelectedItem;
+            var company = (CompanyModel)CmbCompany.SelectedItem;
             var retry = true;
             while (retry)
             {
@@ -393,7 +393,7 @@ namespace TreasuryToolkit.App
 
         private bool ValidateStartProcess()
         {
-            if (CmbCompany.SelectedIndex == 0)
+            if (CmbCompany.SelectedIndex == 0 || CmbCompany.Text == string.Empty)
             {
                 MessageBox.Show("Seleccione una empresa para continuar", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
