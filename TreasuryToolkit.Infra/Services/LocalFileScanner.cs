@@ -210,7 +210,8 @@ namespace TreasuryToolkit.Infra.Services
 
             // --- 4. DATE EXTRACTION ---
             #region Date
-            var datePattern = @"(?:Fecha\s+de\s+aplicación:)\s*(?<date>\d{2}/\d{2}/\d{4})";
+            var datePattern = @"(?:Fecha\s+de\s+(?:aplicación|liquidación):?)\s*(?<date>\d{2}/\d{2}/\d{4})"
+                + @"|(?:Fecha\s+de)\s+(?<date>\d{2}/\d{2}/\d{4})[^\r\n]*[\r\n]+\s*liquidación:";
 
             Match dateMatch = Regex.Match(rawPdfText, datePattern, RegexOptions.IgnoreCase);
             if (dateMatch.Success)
