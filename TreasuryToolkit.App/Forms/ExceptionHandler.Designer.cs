@@ -133,7 +133,7 @@
             MaximizeBox = false;
             Name = "ExceptionHandler";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "TreasuryToolkit - Ocurrio un problema";
+            Text = "Tesoreria - Ocurrio un problema";
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
