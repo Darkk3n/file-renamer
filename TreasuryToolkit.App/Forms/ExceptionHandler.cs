@@ -1,4 +1,4 @@
-﻿namespace TreasuryToolkit.App.Forms
+﻿namespace TreasuryToolkit.App
 {
     public partial class ExceptionHandler : Form
     {
