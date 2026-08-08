@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Windows.Forms;
 
 namespace TreasuryToolkit.App
 {
@@ -7,11 +8,13 @@ namespace TreasuryToolkit.App
         private readonly Exception exception;
         private readonly string settingsFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.local.json");
         private bool isDarkMode = false;
+        private ToolTip copyToolTip;
 
         public ExceptionHandlerForm(Exception exception)
         {
             InitializeComponent();
             this.exception = exception;
+            copyToolTip = new ToolTip();
         }
 
         override protected void OnLoad(EventArgs e)
@@ -26,6 +29,9 @@ namespace TreasuryToolkit.App
         private void BtnCopyDtls_Click(object sender, EventArgs e)
         {
             Clipboard.SetText(TxtExceptionDetails.Text);
+
+            copyToolTip.Show("¡Copiado al portapapeles!", BtnCopyDtls, 0, -35);
+            ToolTipTimer.Start();
         }
 
         private void LoadAndApplySettings()
@@ -69,6 +75,12 @@ namespace TreasuryToolkit.App
                     c.BackColor = controlBg;
                 }
             }
+        }
+
+        private void ToolTipTimer_Tick(object sender, EventArgs e)
+        {
+            copyToolTip.Hide(BtnCopyDtls);
+            ToolTipTimer.Stop();
         }
     }
 }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExceptionHandlerForm));
             label1 = new Label();
             label2 = new Label();
@@ -36,6 +37,7 @@
             BtnCopyDtls = new Button();
             BtnClose = new Button();
             label3 = new Label();
+            ToolTipTimer = new System.Windows.Forms.Timer(components);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -115,6 +117,11 @@
             label3.TabIndex = 6;
             label3.Text = "Sugerencia: Incluir una breve descripción de las acciones o pasos que realizaba justo antes de que apareciera esta ventana facilitará enormemente la corrección.";
             // 
+            // ToolTipTimer
+            // 
+            ToolTipTimer.Interval = 2000;
+            ToolTipTimer.Tick += ToolTipTimer_Tick;
+            // 
             // ExceptionHandlerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -149,5 +156,6 @@
         private Button BtnCopyDtls;
         private Button BtnClose;
         private Label label3;
+        private System.Windows.Forms.Timer ToolTipTimer;
     }
 }
