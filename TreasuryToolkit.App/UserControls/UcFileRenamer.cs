@@ -207,6 +207,7 @@ namespace TreasuryToolkit.App
             {
                 DgvPayments.Rows.Add(DateTime.Now.ToString("yyyyMMdd"), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
                 MessageBox.Show("No se encontraron archivos para escanear.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                EnableControls(true);
                 return;
             }
             files.Sort((x, y) => StrCmpLogicalW(x, y));
