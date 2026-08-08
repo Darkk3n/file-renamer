@@ -53,7 +53,7 @@ namespace TreasuryToolkit.App
         private static void UIThreadException(object sender, ThreadExceptionEventArgs t)
         {
 
-            using var handler = new ExceptionHandler(t.Exception);
+            using var handler = new ExceptionHandlerForm(t.Exception);
             handler.ShowDialog();
         }
     }

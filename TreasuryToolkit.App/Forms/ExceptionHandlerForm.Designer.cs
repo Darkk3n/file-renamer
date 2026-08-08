@@ -1,6 +1,6 @@
 ﻿namespace TreasuryToolkit.App
 {
-    partial class ExceptionHandler
+    partial class ExceptionHandlerForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExceptionHandler));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExceptionHandlerForm));
             label1 = new Label();
             label2 = new Label();
             TxtExceptionDetails = new TextBox();

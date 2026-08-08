@@ -1,10 +1,10 @@
 ﻿namespace TreasuryToolkit.App
 {
-    public partial class ExceptionHandler : Form
+    public partial class ExceptionHandlerForm : Form
     {
         private readonly Exception exception;
 
-        public ExceptionHandler(Exception exception)
+        public ExceptionHandlerForm(Exception exception)
         {
             InitializeComponent();
             this.exception = exception;
