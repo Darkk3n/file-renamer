@@ -190,17 +190,14 @@ namespace TreasuryToolkit.App
             folderDialog.UseDescriptionForTitle = true;
             folderDialog.ShowNewFolderButton = false; // Prevents them making a mess
 
-            //TODO: Uncomment this
-            //if (folderDialog.ShowDialog() == DialogResult.Cancel)
-            //{
-            //    return;
-            //}
+            if (folderDialog.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
             EnableControls(false);
 
-            DgvPayments.Rows.Clear();
-            //TODO: Revert this hardcoded path
-            //var sourceDirectory = folderDialog.SelectedPath;
-            var sourceDirectory = @"C:\Renombrar";
+            DgvPayments.Rows.Clear();            
+            var sourceDirectory = folderDialog.SelectedPath;            
             var files = Directory.GetFiles(sourceDirectory, "*.pdf", System.IO.SearchOption.TopDirectoryOnly).ToList();
 
             if (files.Count == 0)
