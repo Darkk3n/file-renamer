@@ -102,7 +102,7 @@ namespace TreasuryToolkit.Infra.Services
             // This pattern captures "Importe:", any spaces, and numbers formatted like 12,345.00
             // The \. ensures it looks for a literal period right before the cents
             #region Amount
-            string amountPattern = @"(?:Importe:|Monto:)\s*([0-9.,]+\.[0-9]{2})";
+            string amountPattern = @"(?:Importe\s+a\s+enviar:|Importe:|Monto:)\s*([0-9.,]+\.[0-9]{2})";
 
             Match amountMatch = Regex.Match(rawPdfText, amountPattern, RegexOptions.IgnoreCase);
             if (amountMatch.Success)
@@ -197,13 +197,22 @@ namespace TreasuryToolkit.Infra.Services
             }
             else
             {
-                // Fallback: If a PDF layout only has one single Currency label on the whole page
-                Match singleCurrencyMatch = Regex.Match(rawPdfText, @"(?:Divisa\s+de\s+la\s+cuenta|Moneda):\s*([^\r\n:]+)", RegexOptions.IgnoreCase);
-                if (singleCurrencyMatch.Success)
+                Match specialCurrencyMatch = Regex.Match(rawPdfText, @"Importe\s+a\s+enviar:\s*[0-9.,]+\s+([A-Za-z]+)", RegexOptions.IgnoreCase);
+                if (specialCurrencyMatch.Success)
                 {
-                    string singleCurrency = Regex.Split(singleCurrencyMatch.Groups[1].Value, @"(?:Importe|Titular|RFC|Banco|Motivo|$)", RegexOptions.IgnoreCase)[0];
-                    currency = CleanseAndHealText(singleCurrency);
+                    currency = CleanseAndHealText(specialCurrencyMatch.Groups[1].Value);
                     if (currency == "MXP") { currency = "MXN"; }
+                }
+                // Fallback: If a PDF layout only has one single Currency label on the whole page
+                else
+                {
+                    Match singleCurrencyMatch = Regex.Match(rawPdfText, @"(?:Divisa\s+de\s+la\s+cuenta|Moneda):\s*([^\r\n:]+)", RegexOptions.IgnoreCase);
+                    if (singleCurrencyMatch.Success)
+                    {
+                        string singleCurrency = Regex.Split(singleCurrencyMatch.Groups[1].Value, @"(?:Importe|Titular|RFC|Banco|Motivo|$)", RegexOptions.IgnoreCase)[0];
+                        currency = CleanseAndHealText(singleCurrency);
+                        if (currency == "MXP") { currency = "MXN"; }
+                    }
                 }
             }
             #endregion
