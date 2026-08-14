@@ -32,6 +32,15 @@ jobs:
       run: |
         dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true -o ./publish
 
+    # Step 4.5: 🔏 CODE SIGN THE PUBLISHED EXECUTABLE 🔏        
+    - name: Code Sign Executable
+      uses: dlemstra/code-sign-action@v1
+      with:
+        certificate: '${{ secrets.BASE64_CODE_SIGNING_CERT }}'
+        password: '${{ secrets.CODE_SIGNING_PASSWORD }}'
+        folder: './publish'
+        files: 'TreasuryToolkit.App.exe'
+        
     # Step 5: Automatically create a GitHub Release and upload the solitary .exe file
     - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/')
