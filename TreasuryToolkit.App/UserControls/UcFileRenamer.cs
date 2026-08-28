@@ -196,8 +196,8 @@ namespace TreasuryToolkit.App
             }
             EnableControls(false);
 
-            DgvPayments.Rows.Clear();            
-            var sourceDirectory = folderDialog.SelectedPath;            
+            DgvPayments.Rows.Clear();
+            var sourceDirectory = folderDialog.SelectedPath;
             var files = Directory.GetFiles(sourceDirectory, "*.pdf", System.IO.SearchOption.TopDirectoryOnly).ToList();
 
             if (files.Count == 0)
@@ -365,14 +365,50 @@ namespace TreasuryToolkit.App
         {
             try
             {
-                if (Directory.Exists(backupFolder))
+                if (!Directory.Exists(backupFolder)) return;
+
+                // 1. Reset working directory in case the app was pointing inside the backup folder
+                Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
+                // 2. Force garbage collection to release any unclosed PDF/File streams instantly
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+                
+                var dirInfo = new DirectoryInfo(backupFolder);
+                foreach (var file in dirInfo.GetFiles("*", System.IO.SearchOption.AllDirectories))
                 {
-                    Directory.Delete(backupFolder, true);
+                    file.Attributes = FileAttributes.Normal;
+                }
+                foreach (var subDir in dirInfo.GetDirectories("*", System.IO.SearchOption.AllDirectories))
+                {
+                    subDir.Attributes = FileAttributes.Normal;
+                }
+                dirInfo.Attributes = FileAttributes.Normal;
+                
+                int retries = 3;
+                while (retries > 0)
+                {
+                    try
+                    {
+                        Directory.Delete(backupFolder, true);
+                        break;
+                    }
+                    catch (UnauthorizedAccessException) when (retries > 1)
+                    {
+                        retries--;
+                        Thread.Sleep(100);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Nota: El proceso terminó con éxito, pero no se pudo eliminar la carpeta temporal de respaldo: {ex.Message}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    $"Nota: El proceso terminó con éxito, pero no se pudo eliminar la carpeta temporal de respaldo: {ex.Message}",
+                    "Aviso",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
             }
         }
 
