@@ -115,7 +115,10 @@ namespace TreasuryToolkit.Infra.Services
             // Changing +? to + forces it to grab the whole phrase on that line.
             // The lookahead ensures that if "Referencia" is present, it stops right before it.
             #region Reason
-            Match reasonMatch = Regex.Match(rawPdfText, @"(?:Motivo\s+de\s+pago:|Concepto\s+de\s+pago:|Detalle\s+de\ +pago:|Concepto\s+CIE:|Referencia\s+del\s+Beneficiario:)\s*([^\r\n]+)", RegexOptions.IgnoreCase);
+            Match reasonMatch = Regex.Match(
+                rawPdfText,
+                @"(?:Motivo(?:\s+de\s+pago)?|Concepto(?:\s+de\s+pago)?|Concepto\s+CIE|Detalle\s+de\s+pago|Referencia\s+del\s+Beneficiario):\s*([^\r\n]+)",
+                RegexOptions.IgnoreCase);
 
             if (reasonMatch.Success)
             {
@@ -157,24 +160,34 @@ namespace TreasuryToolkit.Infra.Services
             }
             else
             {
-                // Fallback: Single match structural processing
-                string fallbackPattern = @"(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):\s*([^\r\n:]+)";
-                Match fallbackMatch = Regex.Match(rawPdfText, fallbackPattern, RegexOptions.IgnoreCase);
+                string cuentaAbonoPattern = @"Cuenta\s+Abono:\s*(?:\d+[\s-]+\d+\s+)?([A-ZÁÉÍÓÚÑ\s]+)";
+                Match cuentaAbonoMatch = Regex.Match(rawPdfText, cuentaAbonoPattern, RegexOptions.IgnoreCase);
 
-                if (fallbackMatch.Success)
+                if (cuentaAbonoMatch.Success)
                 {
-                    string singleMatch = fallbackMatch.Groups[1].Value;
-                    singleMatch = Regex.Split(singleMatch,
-                        @"(?:RFC|Banco|Monto|Importe|Motivo|Concepto|Dato\s*no\s*verificado" +
-                        @"|\bMEXICOS\s*DERL\b" +
-                        @"|\bS\s*DE?\s*R?L?\s*DE?\s*C?V?\b" +
-                        @"|\bSA\s*DE\s*C?V?\b" +
-                        @"|\bSAPI\s*DE\s*C?V?\b" +
-                        @"|\bS\s*DE?R?L?\b" +
-                        @"|\bSC\b)",
-                        RegexOptions.IgnoreCase)[0];
+                    vendorName = CleanVendorName(cuentaAbonoMatch.Groups[1].Value.Trim());
+                }
+                else
+                {
+                    // Fallback: Single match structural processing
+                    string fallbackPattern = @"(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):\s*([^\r\n:]+)";
+                    Match fallbackMatch = Regex.Match(rawPdfText, fallbackPattern, RegexOptions.IgnoreCase);
 
-                    vendorName = CleanseAndHealText(singleMatch);
+                    if (fallbackMatch.Success)
+                    {
+                        string singleMatch = fallbackMatch.Groups[1].Value;
+                        singleMatch = Regex.Split(singleMatch,
+                            @"(?:RFC|Banco|Monto|Importe|Motivo|Concepto|Dato\s*no\s*verificado" +
+                            @"|\bMEXICOS\s*DERL\b" +
+                            @"|\bS\s*DE?\s*R?L?\s*DE?\s*C?V?\b" +
+                            @"|\bSA\s*DE\s*C?V?\b" +
+                            @"|\bSAPI\s*DE\s*C?V?\b" +
+                            @"|\bS\s*DE?R?L?\b" +
+                            @"|\bSC\b)",
+                            RegexOptions.IgnoreCase)[0];
+
+                        vendorName = CleanseAndHealText(singleMatch);
+                    }
                 }
             }
             #endregion
@@ -230,6 +243,38 @@ namespace TreasuryToolkit.Infra.Services
                 date = parsedDate.ToString("yyyyMMdd");
             }
             #endregion
+        }
+
+        private static string CleanVendorName(string rawVendor)
+        {
+            if (string.IsNullOrWhiteSpace(rawVendor)) return string.Empty;
+
+            string cleaned = CleanseAndHealText(rawVendor).Trim();
+
+            // 1. If 'Importe' or other fields were merged onto the same line without spaces, strip them first
+            cleaned = Regex.Split(cleaned, @"(?:Importe|Monto|Fecha|Referencia|$)", RegexOptions.IgnoreCase)[0].Trim();
+
+            // 2. Known banking/payroll suffixes to remove from the end of the name
+            string[] trailingNoiseKeywords =
+            [
+                "NOMINA",
+                "NOM",
+                "SPEI",
+                "TEF",
+                "PAGO",
+                "TERCEROS",
+                "PROVEEDOR"
+            ];
+
+            foreach (var keyword in trailingNoiseKeywords)
+            {
+                // Matches the keyword at the end of the string ($), 
+                // whether separated by space (\b) or directly glued onto the last word (?<=[A-ZÁÉÍÓÚÑ])
+                string pattern = $@"(?:\b|(?<=[A-ZÁÉÍÓÚÑ]))" + Regex.Escape(keyword) + @"\s*$";
+                cleaned = Regex.Replace(cleaned, pattern, "", RegexOptions.IgnoreCase).Trim();
+            }
+
+            return cleaned;
         }
     }
 }
