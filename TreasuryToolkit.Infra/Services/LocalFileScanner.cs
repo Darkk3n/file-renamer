@@ -102,7 +102,7 @@ namespace TreasuryToolkit.Infra.Services
             // This pattern captures "Importe:", any spaces, and numbers formatted like 12,345.00
             // The \. ensures it looks for a literal period right before the cents
             #region Amount
-            string amountPattern = @"(?:Importe\s+a\s+enviar:|Importe:|Monto:)\s*([0-9.,]+\.[0-9]{2})";
+            string amountPattern = @"(?:Importe(?:\s+a\s+enviar)?|Monto):\s*(?:\$\s*)?([0-9]{1,3}(?:,[0-9]{3})*\.[0-9]{2}|[0-9]+\.[0-9]{2})";
 
             Match amountMatch = Regex.Match(rawPdfText, amountPattern, RegexOptions.IgnoreCase);
             if (amountMatch.Success)
@@ -115,7 +115,10 @@ namespace TreasuryToolkit.Infra.Services
             // Changing +? to + forces it to grab the whole phrase on that line.
             // The lookahead ensures that if "Referencia" is present, it stops right before it.
             #region Reason
-            Match reasonMatch = Regex.Match(rawPdfText, @"(?:Motivo\s+de\s+pago:|Concepto\s+de\s+pago:|Detalle\s+de\ +pago:|Concepto\s+CIE:|Referencia\s+del\s+Beneficiario:)\s*([^\r\n]+)", RegexOptions.IgnoreCase);
+            Match reasonMatch = Regex.Match(
+                rawPdfText,
+                @"(?:Motivo(?:\s+de\s+pago)?|Concepto(?:\s+de\s+pago)?|Concepto\s+CIE|Detalle\s+de\s+pago|Referencia\s+del\s+Beneficiario):\s*([^\r\n]+)",
+                RegexOptions.IgnoreCase);
 
             if (reasonMatch.Success)
             {
@@ -157,24 +160,34 @@ namespace TreasuryToolkit.Infra.Services
             }
             else
             {
-                // Fallback: Single match structural processing
-                string fallbackPattern = @"(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):\s*([^\r\n:]+)";
-                Match fallbackMatch = Regex.Match(rawPdfText, fallbackPattern, RegexOptions.IgnoreCase);
+                string cuentaAbonoPattern = @"Cuenta\s+Abono:\s*(?:\d+[\s-]+\d+\s+)?([A-ZÁÉÍÓÚÑ\s]+)";
+                Match cuentaAbonoMatch = Regex.Match(rawPdfText, cuentaAbonoPattern, RegexOptions.IgnoreCase);
 
-                if (fallbackMatch.Success)
+                if (cuentaAbonoMatch.Success)
                 {
-                    string singleMatch = fallbackMatch.Groups[1].Value;
-                    singleMatch = Regex.Split(singleMatch,
-                        @"(?:RFC|Banco|Monto|Importe|Motivo|Concepto|Dato\s*no\s*verificado" +
-                        @"|\bMEXICOS\s*DERL\b" +
-                        @"|\bS\s*DE?\s*R?L?\s*DE?\s*C?V?\b" +
-                        @"|\bSA\s*DE\s*C?V?\b" +
-                        @"|\bSAPI\s*DE\s*C?V?\b" +
-                        @"|\bS\s*DE?R?L?\b" +
-                        @"|\bSC\b)",
-                        RegexOptions.IgnoreCase)[0];
+                    vendorName = CleanVendorName(cuentaAbonoMatch.Groups[1].Value.Trim());
+                }
+                else
+                {
+                    // Fallback: Single match structural processing
+                    string fallbackPattern = @"(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):\s*([^\r\n:]+)";
+                    Match fallbackMatch = Regex.Match(rawPdfText, fallbackPattern, RegexOptions.IgnoreCase);
 
-                    vendorName = CleanseAndHealText(singleMatch);
+                    if (fallbackMatch.Success)
+                    {
+                        string singleMatch = fallbackMatch.Groups[1].Value;
+                        singleMatch = Regex.Split(singleMatch,
+                            @"(?:RFC|Banco|Monto|Importe|Motivo|Concepto|Dato\s*no\s*verificado" +
+                            @"|\bMEXICOS\s*DERL\b" +
+                            @"|\bS\s*DE?\s*R?L?\s*DE?\s*C?V?\b" +
+                            @"|\bSA\s*DE\s*C?V?\b" +
+                            @"|\bSAPI\s*DE\s*C?V?\b" +
+                            @"|\bS\s*DE?R?L?\b" +
+                            @"|\bSC\b)",
+                            RegexOptions.IgnoreCase)[0];
+
+                        vendorName = CleanseAndHealText(singleMatch);
+                    }
                 }
             }
             #endregion
@@ -182,7 +195,7 @@ namespace TreasuryToolkit.Infra.Services
             // --- 4. CURRENCY EXTRACTION (The Grand Finale) ---
             // Structural Sweep: Skip the 1st "Divisa", capture everything on the line of the 2nd "Divisa"
             #region Currency
-            string currencyPattern = @"(?:Divisa\s+de\s+la\s+cuenta|Moneda):.*?(?:Divisa\s+de\s+la\s+cuenta|Moneda):\s*([^\r\n:]+)";
+            string currencyPattern = @"(?:Divisa(?:\s+de\s+la\s+cuenta)?|Moneda):.*?(?:Divisa(?:\s+de\s+la\s+cuenta)?|Moneda):\s*([^\r\n:]+)";
             Match currencyMatch = Regex.Match(rawPdfText, currencyPattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
             if (currencyMatch.Success)
@@ -206,7 +219,7 @@ namespace TreasuryToolkit.Infra.Services
                 // Fallback: If a PDF layout only has one single Currency label on the whole page
                 else
                 {
-                    Match singleCurrencyMatch = Regex.Match(rawPdfText, @"(?:Divisa\s+de\s+la\s+cuenta|Moneda):\s*([^\r\n:]+)", RegexOptions.IgnoreCase);
+                    Match singleCurrencyMatch = Regex.Match(rawPdfText, @"(?:Divisa(?:\s+de\s+la\s+cuenta)?|Moneda):\s*([^\r\n:]+)", RegexOptions.IgnoreCase);
                     if (singleCurrencyMatch.Success)
                     {
                         string singleCurrency = Regex.Split(singleCurrencyMatch.Groups[1].Value, @"(?:Importe|Titular|RFC|Banco|Motivo|$)", RegexOptions.IgnoreCase)[0];
@@ -219,17 +232,61 @@ namespace TreasuryToolkit.Infra.Services
 
             // --- 4. DATE EXTRACTION ---
             #region Date
-            var datePattern = @"(?:Fecha\s+de\s+(?:aplicación|liquidación):?)\s*(?<date>\d{2}/\d{2}/\d{4})"
-                + @"|(?:Fecha\s+de)\s+(?<date>\d{2}/\d{2}/\d{4})[^\r\n]*[\r\n]+\s*liquidación:";
+            string lineWrappedDatePattern = @"(?:Fecha\s+y\s+hora\s+de\s+Liquidac(?:ió|i)n|Fecha\s+aplicac(?:ió|i)n):\s*([0-9]{1,2}[\/\-][0-9]{1,2}[\/\-][0-9]{2,4}|[0-9]{1,2}\s+de\s+[A-Za-záéíóúÁÉÍÓÚ]+\s+de\s+[0-9]{4}|[0-9]{1,2}[\/\-][A-Za-z]{3}[\/\-][0-9]{2,4})";
 
-            Match dateMatch = Regex.Match(rawPdfText, datePattern, RegexOptions.IgnoreCase);
-            if (dateMatch.Success)
+            Match lineWrappedMatch = Regex.Match(rawPdfText, lineWrappedDatePattern, RegexOptions.IgnoreCase);
+            if (lineWrappedMatch.Success)
             {
-                var rawDate = dateMatch.Groups[1].Value;
-                DateTime parsedDate = DateTime.ParseExact(rawDate, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                string extractedDate = lineWrappedMatch.Groups[1].Value;             
+                DateTime parsedDate = DateTime.ParseExact(extractedDate, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                 date = parsedDate.ToString("yyyyMMdd");
             }
+            else
+            {
+                var datePattern = @"(?:Fecha\s+de\s+(?:aplicación|liquidación):?)\s*(?<date>\d{2}/\d{2}/\d{4})"
+                    + @"|(?:Fecha\s+de)\s+(?<date>\d{2}/\d{2}/\d{4})[^\r\n]*[\r\n]+\s*liquidación:";
+
+                Match dateMatch = Regex.Match(rawPdfText, datePattern, RegexOptions.IgnoreCase);
+                if (dateMatch.Success)
+                {
+                    var rawDate = dateMatch.Groups[1].Value;
+                    DateTime parsedDate = DateTime.ParseExact(rawDate, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                    date = parsedDate.ToString("yyyyMMdd");
+                }
+            }
             #endregion
+        }
+
+        private static string CleanVendorName(string rawVendor)
+        {
+            if (string.IsNullOrWhiteSpace(rawVendor)) return string.Empty;
+
+            string cleaned = CleanseAndHealText(rawVendor).Trim();
+
+            // 1. If 'Importe' or other fields were merged onto the same line without spaces, strip them first
+            cleaned = Regex.Split(cleaned, @"(?:Importe|Monto|Fecha|Referencia|$)", RegexOptions.IgnoreCase)[0].Trim();
+
+            // 2. Known banking/payroll suffixes to remove from the end of the name
+            string[] trailingNoiseKeywords =
+            [
+                "NOMINA",
+                "NOM",
+                "SPEI",
+                "TEF",
+                "PAGO",
+                "TERCEROS",
+                "PROVEEDOR"
+            ];
+
+            foreach (var keyword in trailingNoiseKeywords)
+            {
+                // Matches the keyword at the end of the string ($), 
+                // whether separated by space (\b) or directly glued onto the last word (?<=[A-ZÁÉÍÓÚÑ])
+                string pattern = $@"(?:\b|(?<=[A-ZÁÉÍÓÚÑ]))" + Regex.Escape(keyword) + @"\s*$";
+                cleaned = Regex.Replace(cleaned, pattern, "", RegexOptions.IgnoreCase).Trim();
+            }
+
+            return cleaned;
         }
     }
 }
