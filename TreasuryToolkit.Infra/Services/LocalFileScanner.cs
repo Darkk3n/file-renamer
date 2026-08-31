@@ -102,7 +102,7 @@ namespace TreasuryToolkit.Infra.Services
             // This pattern captures "Importe:", any spaces, and numbers formatted like 12,345.00
             // The \. ensures it looks for a literal period right before the cents
             #region Amount
-            string amountPattern = @"(?:Importe\s+a\s+enviar:|Importe:|Monto:)\s*([0-9.,]+\.[0-9]{2})";
+            string amountPattern = @"(?:Importe(?:\s+a\s+enviar)?|Monto):\s*(?:\$\s*)?([0-9]{1,3}(?:,[0-9]{3})*\.[0-9]{2}|[0-9]+\.[0-9]{2})";
 
             Match amountMatch = Regex.Match(rawPdfText, amountPattern, RegexOptions.IgnoreCase);
             if (amountMatch.Success)
