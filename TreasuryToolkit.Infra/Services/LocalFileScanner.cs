@@ -182,7 +182,7 @@ namespace TreasuryToolkit.Infra.Services
             // --- 4. CURRENCY EXTRACTION (The Grand Finale) ---
             // Structural Sweep: Skip the 1st "Divisa", capture everything on the line of the 2nd "Divisa"
             #region Currency
-            string currencyPattern = @"(?:Divisa\s+de\s+la\s+cuenta|Moneda):.*?(?:Divisa\s+de\s+la\s+cuenta|Moneda):\s*([^\r\n:]+)";
+            string currencyPattern = @"(?:Divisa(?:\s+de\s+la\s+cuenta)?|Moneda):.*?(?:Divisa(?:\s+de\s+la\s+cuenta)?|Moneda):\s*([^\r\n:]+)";
             Match currencyMatch = Regex.Match(rawPdfText, currencyPattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
             if (currencyMatch.Success)
@@ -206,7 +206,7 @@ namespace TreasuryToolkit.Infra.Services
                 // Fallback: If a PDF layout only has one single Currency label on the whole page
                 else
                 {
-                    Match singleCurrencyMatch = Regex.Match(rawPdfText, @"(?:Divisa\s+de\s+la\s+cuenta|Moneda):\s*([^\r\n:]+)", RegexOptions.IgnoreCase);
+                    Match singleCurrencyMatch = Regex.Match(rawPdfText, @"(?:Divisa(?:\s+de\s+la\s+cuenta)?|Moneda):\s*([^\r\n:]+)", RegexOptions.IgnoreCase);
                     if (singleCurrencyMatch.Success)
                     {
                         string singleCurrency = Regex.Split(singleCurrencyMatch.Groups[1].Value, @"(?:Importe|Titular|RFC|Banco|Motivo|$)", RegexOptions.IgnoreCase)[0];
