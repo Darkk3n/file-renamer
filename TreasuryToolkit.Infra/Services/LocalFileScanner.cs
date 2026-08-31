@@ -232,15 +232,27 @@ namespace TreasuryToolkit.Infra.Services
 
             // --- 4. DATE EXTRACTION ---
             #region Date
-            var datePattern = @"(?:Fecha\s+de\s+(?:aplicación|liquidación):?)\s*(?<date>\d{2}/\d{2}/\d{4})"
-                + @"|(?:Fecha\s+de)\s+(?<date>\d{2}/\d{2}/\d{4})[^\r\n]*[\r\n]+\s*liquidación:";
+            string lineWrappedDatePattern = @"(?:Fecha\s+y\s+hora\s+de\s+Liquidac(?:ió|i)n|Fecha\s+aplicac(?:ió|i)n):\s*([0-9]{1,2}[\/\-][0-9]{1,2}[\/\-][0-9]{2,4}|[0-9]{1,2}\s+de\s+[A-Za-záéíóúÁÉÍÓÚ]+\s+de\s+[0-9]{4}|[0-9]{1,2}[\/\-][A-Za-z]{3}[\/\-][0-9]{2,4})";
 
-            Match dateMatch = Regex.Match(rawPdfText, datePattern, RegexOptions.IgnoreCase);
-            if (dateMatch.Success)
+            Match lineWrappedMatch = Regex.Match(rawPdfText, lineWrappedDatePattern, RegexOptions.IgnoreCase);
+            if (lineWrappedMatch.Success)
             {
-                var rawDate = dateMatch.Groups[1].Value;
-                DateTime parsedDate = DateTime.ParseExact(rawDate, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                string extractedDate = lineWrappedMatch.Groups[1].Value;             
+                DateTime parsedDate = DateTime.ParseExact(extractedDate, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                 date = parsedDate.ToString("yyyyMMdd");
+            }
+            else
+            {
+                var datePattern = @"(?:Fecha\s+de\s+(?:aplicación|liquidación):?)\s*(?<date>\d{2}/\d{2}/\d{4})"
+                    + @"|(?:Fecha\s+de)\s+(?<date>\d{2}/\d{2}/\d{4})[^\r\n]*[\r\n]+\s*liquidación:";
+
+                Match dateMatch = Regex.Match(rawPdfText, datePattern, RegexOptions.IgnoreCase);
+                if (dateMatch.Success)
+                {
+                    var rawDate = dateMatch.Groups[1].Value;
+                    DateTime parsedDate = DateTime.ParseExact(rawDate, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                    date = parsedDate.ToString("yyyyMMdd");
+                }
             }
             #endregion
         }
