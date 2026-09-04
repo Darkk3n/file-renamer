@@ -231,7 +231,7 @@ namespace TreasuryToolkit.App
 
             DgvPayments.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
             loadingScreen.Close();
-            MessageBox.Show($"Se escanearon y cargaron {files.Count}(s) archivo(s) en la tabla.", "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show($"Se escanearon y cargaron {files.Count} archivo(s) en la tabla.", "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LblFolder.Text = sourceDirectory;
             EnableControls(true);
         }

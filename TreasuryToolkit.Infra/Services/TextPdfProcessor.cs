@@ -42,7 +42,7 @@ namespace TreasuryToolkit.Infra.Services
                 string newFileName = $"{row.Date}-{companyName}-{vendor}-{concept}-{amount} {currency}";
                 if (comment.HasValue)
                 {
-                    newFileName+=$" ({comment})";
+                    newFileName += $" ({comment})";
                 }
                 newFileName += $".pdf";
                 string destinationPath = Path.Combine(directory, newFileName);
@@ -60,8 +60,8 @@ namespace TreasuryToolkit.Infra.Services
 
                     using (PdfWriter writer = new(safeDestinationPath))
                     using (PdfDocument newSinglePagePdf = new(writer))
-                    {
-                        if (companyName == "EMKA")
+                    {                      
+                        if (companyName.In("EMKA", "KLEIBERIT"))
                         {
                             SliceSecuredPage(sourcePdfDoc, newSinglePagePdf, internalPageTracker);
                         }
