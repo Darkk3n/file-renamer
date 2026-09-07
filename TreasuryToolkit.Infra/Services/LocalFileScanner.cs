@@ -160,7 +160,7 @@ namespace TreasuryToolkit.Infra.Services
             }
             else
             {
-                string cuentaAbonoPattern = @"Cuenta\s+Abono:\s*(?:\d+[\s-]+\d+\s+)?([A-ZÁÉÍÓÚÑ\s]+)";
+                string cuentaAbonoPattern = @"Cuenta\s+Abono:\s*(?:[\d\s-]+\s+)?(?:-\s+)?([A-ZÁÉÍÓÚÑ\s]+)";
                 Match cuentaAbonoMatch = Regex.Match(rawPdfText, cuentaAbonoPattern, RegexOptions.IgnoreCase);
 
                 if (cuentaAbonoMatch.Success)
@@ -275,7 +275,8 @@ namespace TreasuryToolkit.Infra.Services
                 "TEF",
                 "PAGO",
                 "TERCEROS",
-                "PROVEEDOR"
+                "PROVEEDOR",
+                "SAPIDECV"
             ];
 
             foreach (var keyword in trailingNoiseKeywords)
