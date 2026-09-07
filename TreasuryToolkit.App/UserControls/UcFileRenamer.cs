@@ -229,7 +229,7 @@ namespace TreasuryToolkit.App
                  }
             );
 
-            DgvPayments.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+            ResizeGridColumns();
             loadingScreen.Close();
             MessageBox.Show($"Se escanearon y cargaron {files.Count} archivo(s) en la tabla.", "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LblFolder.Text = sourceDirectory;
@@ -247,6 +247,30 @@ namespace TreasuryToolkit.App
         #endregion
 
         #region Helpers
+
+        private void ResizeGridColumns()
+        {
+            // Prevent UI redraw flickering while updating column layouts
+            DgvPayments.SuspendLayout();
+
+            DgvPayments.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            DgvPayments.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+
+            // Index 2 & 3: Vendor & Reason -> Fill remaining space dynamically
+            DgvPayments.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            DgvPayments.Columns[2].FillWeight = 50; // Shares 50% of remaining space
+
+            DgvPayments.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            DgvPayments.Columns[3].FillWeight = 50; // Shares 50% of remaining space
+
+
+            DgvPayments.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            DgvPayments.Columns[5].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+            DgvPayments.Columns[6].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+
+            DgvPayments.ResumeLayout();
+        }
+
         private void SetupGrid()
         {
             DgvPayments.Columns[0].FillWeight = 75;
